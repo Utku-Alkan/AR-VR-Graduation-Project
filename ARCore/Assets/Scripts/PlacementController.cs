@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
-
+using UnityEngine.UI;
 
 // inspectorda bu scripti bir objecte ekleyince otomatik ARRaycastManager component'ini da ekliyor "RequireComponent"
 
@@ -11,6 +11,11 @@ public class PlacementController : MonoBehaviour
 {
 
     [SerializeField] private GameObject placedPrefab;
+
+    [SerializeField] private Text infoText;
+
+
+
 
     public GameObject PlacedPrefab
     {
@@ -50,9 +55,10 @@ public class PlacementController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-     
-        
-        if(!TryGetTouchPosition(out Vector2 touchPoisition))
+
+
+
+        if (!TryGetTouchPosition(out Vector2 touchPoisition))
         {
             return;
         }
@@ -63,6 +69,8 @@ public class PlacementController : MonoBehaviour
             var hitPose = hits[0].pose; // first position of the hit
 
             Instantiate(placedPrefab, hitPose.position, hitPose.rotation);
+
+            infoText.text = "Object successfully created";
         }
 
 
