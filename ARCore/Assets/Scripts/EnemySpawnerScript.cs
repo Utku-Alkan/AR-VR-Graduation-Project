@@ -2,16 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
-
+using UnityEngine.UI;
 
 public class EnemySpawnerScript : MonoBehaviour
 {
-    public GameObject enemy;
+    [SerializeField] GameObject enemy;
     [SerializeField] Transform cameraPosition;
+    [SerializeField] Text healthText;
 
     private float timer = 0f;
-    private float interval = 2f; // Each 5 seconds enemy born
-    private float moveSpeed = 0.5f; // Speed at which the enemy moves
+    private float interval = 2f; // Each 2 seconds enemy born
+    private float moveSpeed = 0.3f; // Speed at which the enemy moves
     private List<GameObject> enemyList = new List<GameObject>();
 
     // Update is called once per frame
@@ -37,7 +38,7 @@ public class EnemySpawnerScript : MonoBehaviour
                 specifiedRandomNumber = randomNumber;
             }
 
-            Vector3 instantiatePosition = new Vector3(specifiedRandomNumber, Random.Range(-1, 5), specifiedRandomNumber);
+            Vector3 instantiatePosition = new Vector3(transform.position.x + specifiedRandomNumber, transform.position.y + Random.Range(-1, 5), transform.position.z + specifiedRandomNumber);
 
             GameObject aliveEnemy = Instantiate(enemy, instantiatePosition, Quaternion.identity);
             enemyList.Add(aliveEnemy);
@@ -49,7 +50,7 @@ public class EnemySpawnerScript : MonoBehaviour
             enemyGameObject.transform.position = Vector3.Lerp(enemyGameObject.transform.position, cameraPosition.position, step);
         }
 
-        if(enemyList.Count > 10)
+        if(enemyList.Count > 50)
         {
             foreach (GameObject enemyGameObject in enemyList)
             {
@@ -57,5 +58,13 @@ public class EnemySpawnerScript : MonoBehaviour
             }
             enemyList.Clear();
         }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        Debug.Log("Enemy hit player");
+        healthText.text = (int.Parse(healthText.text) - 1).ToString();
+        enemyList.Remove(other.gameObject);
+        Destroy(other.gameObject);
     }
 }
