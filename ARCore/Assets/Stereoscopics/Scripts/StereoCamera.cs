@@ -3,7 +3,6 @@ using System.Collections;
 
 public class StereoCamera : MonoBehaviour {
 	public int camera_mode=0;
-	public int stereo_mode=0;
 	public Transform target;
 	public float displacement=17;
 	public bool stereo=true;
