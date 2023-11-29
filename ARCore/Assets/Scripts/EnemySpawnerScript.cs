@@ -10,12 +10,14 @@ public class EnemySpawnerScript : MonoBehaviour
     [SerializeField] Transform cameraPosition;
     [SerializeField] Text healthText;
 
-    [SerializeField] GameObject collectableAlly;
+    [SerializeField] List<GameObject> collectableAllies;
     [SerializeField] int collectableCount;
 
     private float timer = 0f;
-    private float interval = 4f; // Each 2 seconds enemy born
-    private float moveSpeed = 0.3f; // Speed at which the enemy moves
+    [SerializeField] float enemyBornInterval;
+    [SerializeField] float moveSpeed;
+    [SerializeField] int maxEnemyCount;
+
     private List<GameObject> enemyList = new List<GameObject>();
 
     private List<GameObject> collectableAllyList = new List<GameObject>();
@@ -30,10 +32,10 @@ public class EnemySpawnerScript : MonoBehaviour
         // collectable born
         for(int i = 0; i < collectableCount; i++)
         {
-            int allyRandom1 = Random.Range(-10, 10);
-            int allyRandom2 = Random.Range(-10, 10);
+            int allyRandom1 = Random.Range(-2, 2);
+            int allyRandom2 = Random.Range(-2, 2);
             Vector3 instantiatePositionCollectable = new Vector3(transform.position.x + allyRandom1, transform.position.y, transform.position.z + allyRandom2);
-            GameObject aliveCollectable = Instantiate(collectableAlly, instantiatePositionCollectable, Quaternion.identity);
+            GameObject aliveCollectable = Instantiate(collectableAllies[Random.Range(0, collectableAllies.Count)], instantiatePositionCollectable, Quaternion.identity);
             collectableAllyList.Add(aliveCollectable);
         }
     }
@@ -45,10 +47,10 @@ public class EnemySpawnerScript : MonoBehaviour
         timer += Time.deltaTime;
 
         // Check if the timer has reached the interval
-        if (timer >= interval)
+        if (timer >= enemyBornInterval)
         {
 
-            if (enemyList.Count < 6)
+            if (enemyList.Count < maxEnemyCount)
             {
                 // enemy born
                 Debug.Log("Enemy Born");

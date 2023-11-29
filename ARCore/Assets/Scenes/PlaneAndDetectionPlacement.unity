@@ -483,12 +483,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a823c9ef102e95c468cc22ca2db8db4f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemy: {fileID: 8189980434977739222, guid: 8e7f905057ec14a40a6d37228a69c2e5, type: 3}
+  enemy: {fileID: 6226904149823388056, guid: 0d710c6f6394e7044a1bc8693307318f, type: 3}
   cameraPosition: {fileID: 1194943981}
   healthText: {fileID: 528665583}
-  collectableAlly: {fileID: 7396819204844518561, guid: 44c8b018beedd474e94bcc77e59c291c,
-    type: 3}
-  collectableCount: 20
+  collectableAllies:
+  - {fileID: 8876463639790220501, guid: d68beee1d38369145b56a07431d02732, type: 3}
+  - {fileID: 9145542959179828537, guid: 220011220e7337f43a374a35428a8867, type: 3}
+  - {fileID: 4398236367112636731, guid: f71e70b1c3c203a41a57f19857e4ccf7, type: 3}
+  collectableCount: 5
+  enemyBornInterval: 6
+  moveSpeed: 0.2
+  maxEnemyCount: 6
   gameOverPanel: {fileID: 446392582}
   youWinText: {fileID: 1398013890}
 --- !u!4 &491027299
@@ -1205,7 +1210,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1284049347}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fa17d122634046b4a8e23048891fafc5, type: 3}
   m_Name: 
