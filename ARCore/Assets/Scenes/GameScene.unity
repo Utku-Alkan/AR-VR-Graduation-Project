@@ -490,7 +490,7 @@ MonoBehaviour:
   - {fileID: 8876463639790220501, guid: d68beee1d38369145b56a07431d02732, type: 3}
   - {fileID: 9145542959179828537, guid: 220011220e7337f43a374a35428a8867, type: 3}
   - {fileID: 4398236367112636731, guid: f71e70b1c3c203a41a57f19857e4ccf7, type: 3}
-  collectableCount: 5
+  collectableCount: 10
   enemyBornInterval: 6
   moveSpeed: 0.2
   maxEnemyCount: 6
@@ -926,7 +926,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.5188679, g: 0.27118188, b: 0.27118188, a: 1}
+  m_BackGroundColor: {r: 0.1707725, g: 0.23919895, b: 0.7735849, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0

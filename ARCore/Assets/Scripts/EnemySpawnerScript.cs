@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class EnemySpawnerScript : MonoBehaviour
@@ -32,8 +33,8 @@ public class EnemySpawnerScript : MonoBehaviour
         // collectable born
         for(int i = 0; i < collectableCount; i++)
         {
-            int allyRandom1 = Random.Range(-2, 2);
-            int allyRandom2 = Random.Range(-2, 2);
+            int allyRandom1 = Random.Range(-4, 4);
+            int allyRandom2 = Random.Range(-4, 4);
             Vector3 instantiatePositionCollectable = new Vector3(transform.position.x + allyRandom1, transform.position.y, transform.position.z + allyRandom2);
             GameObject aliveCollectable = Instantiate(collectableAllies[Random.Range(0, collectableAllies.Count)], instantiatePositionCollectable, Quaternion.identity);
             collectableAllyList.Add(aliveCollectable);
@@ -96,6 +97,7 @@ public class EnemySpawnerScript : MonoBehaviour
             {
                 gameOverPanel.SetActive(true);
                 youWinText.text = "You Lost :(";
+                StartCoroutine(ChangeSceneAfterDelay(5f));
             }
         }else if (other.CompareTag("CollectableAlly"))
         {
@@ -108,7 +110,14 @@ public class EnemySpawnerScript : MonoBehaviour
             {
                 gameOverPanel.SetActive(true);
                 youWinText.text = "You Win!";
+                StartCoroutine(ChangeSceneAfterDelay(5f));
             }
         }
+    }
+
+    private IEnumerator ChangeSceneAfterDelay(float afterSeconds)
+    {
+        yield return new WaitForSeconds(afterSeconds); 
+        SceneManager.LoadScene("MainScene");
     }
 }
