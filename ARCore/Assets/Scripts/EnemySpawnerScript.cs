@@ -26,7 +26,11 @@ public class EnemySpawnerScript : MonoBehaviour
     // logics
     [SerializeField] GameObject gameOverPanel;
     [SerializeField] Text youWinText;
+    [SerializeField] Text HighscoreText;
+    [SerializeField] Text timeRemainingCounter;
+    [SerializeField] float timeRemaining;
 
+    private bool isGameFinished = false;
 
     void Start()
     {
@@ -50,12 +54,25 @@ public class EnemySpawnerScript : MonoBehaviour
         // Check if the timer has reached the interval
         if (timer >= enemyBornInterval)
         {
+            timer = 0f;
 
+
+            // collectable born
+            for (int i = 0; i < collectableCount; i++)
+            {
+                int allyRandom1 = Random.Range(-4, 4);
+                int allyRandom2 = Random.Range(-4, 4);
+                Vector3 instantiatePositionCollectable = new Vector3(transform.position.x + allyRandom1, transform.position.y, transform.position.z + allyRandom2);
+                GameObject aliveCollectable = Instantiate(collectableAllies[Random.Range(0, collectableAllies.Count)], instantiatePositionCollectable, Quaternion.identity);
+                collectableAllyList.Add(aliveCollectable);
+            }
+
+
+            // enemy born
             if (enemyList.Count < maxEnemyCount)
             {
                 // enemy born
                 Debug.Log("Enemy Born");
-                timer = 0f;
 
                 // randoming the instantiate
                 int randomNumber = Random.Range(10, 21);
@@ -82,10 +99,46 @@ public class EnemySpawnerScript : MonoBehaviour
         }
 
 
+        // time remaining counter backwards
+        if (timeRemaining > 0.5f)
+        {
+            timeRemaining -= Time.deltaTime; // Count down by the time passed since the last frame
+
+            // Update the text field with the formatted time
+            int minutes = Mathf.FloorToInt(timeRemaining / 60);
+            int seconds = Mathf.FloorToInt(timeRemaining % 60);
+            string timeString = string.Format("{0:00}:{1:00}", minutes, seconds);
+            timeRemainingCounter.text = "Time Left: " + timeString;
+        }
+        else
+        {
+            if (!isGameFinished)
+            {
+                isGameFinished = true;
+                gameOverPanel.SetActive(true);
+                youWinText.text = "Your Score: " + healthText.text;
+
+                int highScore = PlayerPrefs.GetInt("highscore", 0);
+
+                if (highScore < int.Parse(healthText.text))
+                {
+                    HighscoreText.text = "NEW HIGHSCORE!!!";
+                    PlayerPrefs.SetInt("highscore", int.Parse(healthText.text));
+                }
+                else
+                {
+                    HighscoreText.text = "Your Highscore: " + highScore.ToString();
+                }
+
+                StartCoroutine(ChangeSceneAfterDelay(5f));
+            }
+        }
+
     }
 
     private void OnTriggerEnter(Collider other)
     {
+
         if (other.CompareTag("Enemy"))
         {
             Debug.Log("Enemy hit player");
@@ -95,9 +148,15 @@ public class EnemySpawnerScript : MonoBehaviour
 
             if(int.Parse(healthText.text) < 1) // you lost
             {
-                gameOverPanel.SetActive(true);
-                youWinText.text = "You Lost :(";
-                StartCoroutine(ChangeSceneAfterDelay(5f));
+                if (!isGameFinished)
+                {
+                    isGameFinished = true;
+                    gameOverPanel.SetActive(true);
+                    youWinText.text = "You Lost :(";
+                    int highScore = PlayerPrefs.GetInt("highscore", 0);
+                    HighscoreText.text = "Your Highscore: " + highScore.ToString();
+                    StartCoroutine(ChangeSceneAfterDelay(5f));
+                }
             }
         }else if (other.CompareTag("CollectableAlly"))
         {
@@ -108,9 +167,15 @@ public class EnemySpawnerScript : MonoBehaviour
 
             if(collectableAllyList.Count < 1) // you win
             {
-                gameOverPanel.SetActive(true);
-                youWinText.text = "You Win!";
-                StartCoroutine(ChangeSceneAfterDelay(5f));
+                if (!isGameFinished)
+                {
+                    isGameFinished = true;
+                    gameOverPanel.SetActive(true);
+                    youWinText.text = "You Collected Everything?!";
+                    int highScore = PlayerPrefs.GetInt("highscore", 0);
+                    HighscoreText.text = "Your Highscore: " + highScore.ToString();
+                    StartCoroutine(ChangeSceneAfterDelay(5f));
+                }
             }
         }
     }
