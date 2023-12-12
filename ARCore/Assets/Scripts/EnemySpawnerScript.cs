@@ -23,12 +23,13 @@ public class EnemySpawnerScript : MonoBehaviour
 
     private List<GameObject> collectableAllyList = new List<GameObject>();
 
-    // logics
+    // logics for UI
     [SerializeField] GameObject gameOverPanel;
     [SerializeField] Text youWinText;
     [SerializeField] Text HighscoreText;
-    [SerializeField] Text timeRemainingCounter;
-    [SerializeField] float timeRemaining;
+    [SerializeField] Text ScoreText;
+
+
 
     private bool isGameFinished = false;
 
@@ -99,40 +100,7 @@ public class EnemySpawnerScript : MonoBehaviour
         }
 
 
-        // time remaining counter backwards
-        if (timeRemaining > 0.5f)
-        {
-            timeRemaining -= Time.deltaTime; // Count down by the time passed since the last frame
-
-            // Update the text field with the formatted time
-            int minutes = Mathf.FloorToInt(timeRemaining / 60);
-            int seconds = Mathf.FloorToInt(timeRemaining % 60);
-            string timeString = string.Format("{0:00}:{1:00}", minutes, seconds);
-            timeRemainingCounter.text = "Time Left: " + timeString;
-        }
-        else
-        {
-            if (!isGameFinished)
-            {
-                isGameFinished = true;
-                gameOverPanel.SetActive(true);
-                youWinText.text = "Your Score: " + healthText.text;
-
-                int highScore = PlayerPrefs.GetInt("highscore", 0);
-
-                if (highScore < int.Parse(healthText.text))
-                {
-                    HighscoreText.text = "NEW HIGHSCORE!!!";
-                    PlayerPrefs.SetInt("highscore", int.Parse(healthText.text));
-                }
-                else
-                {
-                    HighscoreText.text = "Your Highscore: " + highScore.ToString();
-                }
-
-                StartCoroutine(ChangeSceneAfterDelay(5f));
-            }
-        }
+        
 
     }
 
@@ -141,40 +109,51 @@ public class EnemySpawnerScript : MonoBehaviour
 
         if (other.CompareTag("Enemy"))
         {
-            Debug.Log("Enemy hit player");
-            healthText.text = (int.Parse(healthText.text) - 1).ToString();
-            enemyList.Remove(other.gameObject);
-            Destroy(other.gameObject);
-
-            if(int.Parse(healthText.text) < 1) // you lost
+            if (!isGameFinished)
             {
-                if (!isGameFinished)
+                Debug.Log("Enemy hit player");
+                healthText.text = (int.Parse(healthText.text) - 1).ToString();
+                enemyList.Remove(other.gameObject);
+                Destroy(other.gameObject);
+
+                if (int.Parse(healthText.text) < 1) // you lost
                 {
                     isGameFinished = true;
                     gameOverPanel.SetActive(true);
-                    youWinText.text = "You Lost :(";
+                    youWinText.text = "Your Score: " + ScoreText.text;
+
                     int highScore = PlayerPrefs.GetInt("highscore", 0);
-                    HighscoreText.text = "Your Highscore: " + highScore.ToString();
-                    StartCoroutine(ChangeSceneAfterDelay(5f));
+
+                    if (highScore < int.Parse(ScoreText.text))
+                    {
+                        HighscoreText.text = "NEW HIGHSCORE!!!";
+                        PlayerPrefs.SetInt("highscore", int.Parse(ScoreText.text));
+                    }
+                    else
+                    {
+                        HighscoreText.text = "Your Highscore: " + highScore.ToString();
+                    }
+
+
+                    StartCoroutine(ChangeSceneAfterDelay(10f));
                 }
             }
         }else if (other.CompareTag("CollectableAlly"))
         {
-            Debug.Log("Player collected collectable");
-            healthText.text = (int.Parse(healthText.text) + 1).ToString();
-            collectableAllyList.Remove(other.gameObject);
-            Destroy(other.gameObject);
+            if (!isGameFinished) { 
+                Debug.Log("Player collected collectable");
+                ScoreText.text = (int.Parse(ScoreText.text) + 1).ToString();
+                collectableAllyList.Remove(other.gameObject);
+                Destroy(other.gameObject);
 
-            if(collectableAllyList.Count < 1) // you win
-            {
-                if (!isGameFinished)
+                if(collectableAllyList.Count < 1) // you win
                 {
                     isGameFinished = true;
                     gameOverPanel.SetActive(true);
                     youWinText.text = "You Collected Everything?!";
                     int highScore = PlayerPrefs.GetInt("highscore", 0);
                     HighscoreText.text = "Your Highscore: " + highScore.ToString();
-                    StartCoroutine(ChangeSceneAfterDelay(5f));
+                    StartCoroutine(ChangeSceneAfterDelay(10f));
                 }
             }
         }
