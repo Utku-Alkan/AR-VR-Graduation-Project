@@ -13,6 +13,7 @@ public class EnemySpawnerScript : MonoBehaviour
 
     [SerializeField] List<GameObject> collectableAllies;
     [SerializeField] int collectableCount;
+    private CollectableProperties CollectableProperties;
 
     private float timer = 0f;
     [SerializeField] float enemyBornInterval;
@@ -29,12 +30,47 @@ public class EnemySpawnerScript : MonoBehaviour
     [SerializeField] Text HighscoreText;
     [SerializeField] Text ScoreText;
 
+    [SerializeField] float locationThreshold = 0.0001f;
+    [SerializeField] GameObject heartObject;
 
+    // location based --> cafeteria
+    [SerializeField] float cafeteriaLatitude = 40.8913544f;
+    [SerializeField] float cafeteriaLongitude = 29.3799419f;
+    [SerializeField] List<GameObject> cafeteriaCollectables;
+
+    // location based --> IC
+    [SerializeField] float ICLatitude = 40.8902126f;
+    [SerializeField] float ICLongitude = 29.3774370f;
+    [SerializeField] List<GameObject> ICCollectables;
+
+    // location based --> grass
+    [SerializeField] float grassLatitude = 40.8915148f;
+    [SerializeField] float grassLongitude = 29.3792097f;
+    [SerializeField] List<GameObject> grassCollectables;
+
+    // location based --> FENS
+    [SerializeField] float FENSLatitude = 40.8906865f;
+    [SerializeField] float FENSLongitude = 29.3795895f;
+    [SerializeField] List<GameObject> FENSCollectables;
+
+    // location based --> FMAN
+    [SerializeField] float FMANLatitude = 40.8921368f;
+    [SerializeField] float FMANLongitude = 29.3792200f;
+    [SerializeField] List<GameObject> FMANCollectables;
 
     private bool isGameFinished = false;
 
     void Start()
     {
+        /*if (!Permission.HasUserAuthorizedPermission(Permission.FineLocation))
+        {
+            Permission.RequestUserPermission(Permission.FineLocation);
+        }*/
+
+        if (!Input.location.isEnabledByUser) return;
+
+        Input.location.Start();
+
         // collectable born
         for(int i = 0; i < collectableCount; i++)
         {
@@ -59,13 +95,38 @@ public class EnemySpawnerScript : MonoBehaviour
 
 
             // collectable born
-            for (int i = 0; i < collectableCount; i++)
+            if (Input.location.status == LocationServiceStatus.Running)
             {
-                int allyRandom1 = Random.Range(-4, 4);
-                int allyRandom2 = Random.Range(-4, 4);
-                Vector3 instantiatePositionCollectable = new Vector3(transform.position.x + allyRandom1, transform.position.y, transform.position.z + allyRandom2);
-                GameObject aliveCollectable = Instantiate(collectableAllies[Random.Range(0, collectableAllies.Count)], instantiatePositionCollectable, Quaternion.identity);
-                collectableAllyList.Add(aliveCollectable);
+                LocationInfo currentLocation = Input.location.lastData;
+                // cafeteria
+                if (IsCloseToLocation(currentLocation.latitude, currentLocation.longitude, cafeteriaLatitude, cafeteriaLongitude))
+                {
+                    SpawnCollectables(cafeteriaCollectables);
+                }
+                // IC
+                else if (IsCloseToLocation(currentLocation.latitude, currentLocation.longitude, ICLatitude, ICLongitude))
+                {
+                    SpawnCollectables(ICCollectables);
+                }
+                // grass
+                else if (IsCloseToLocation(currentLocation.latitude, currentLocation.longitude, grassLatitude, grassLongitude))
+                {
+                    SpawnCollectables(grassCollectables);
+                }
+                // FENS
+                else if (IsCloseToLocation(currentLocation.latitude, currentLocation.longitude, FENSLatitude, FENSLongitude))
+                {
+                    SpawnCollectables(FENSCollectables);
+                }
+                // UC
+                else if (IsCloseToLocation(currentLocation.latitude, currentLocation.longitude, FMANLatitude, FMANLongitude))
+                {
+                    SpawnCollectables(FMANCollectables);
+                }
+                else
+                {
+                    SpawnCollectables(collectableAllies);
+                }
             }
 
 
@@ -98,10 +159,6 @@ public class EnemySpawnerScript : MonoBehaviour
             float step = moveSpeed * Time.deltaTime;
             enemyGameObject.transform.position = Vector3.Lerp(enemyGameObject.transform.position, cameraPosition.position, step);
         }
-
-
-        
-
     }
 
     private void OnTriggerEnter(Collider other)
@@ -138,10 +195,20 @@ public class EnemySpawnerScript : MonoBehaviour
                     StartCoroutine(ChangeSceneAfterDelay(10f));
                 }
             }
-        }else if (other.CompareTag("CollectableAlly"))
+        }
+        else if (other.CompareTag("CollectableAlly"))
         {
             if (!isGameFinished) { 
                 Debug.Log("Player collected collectable");
+                int healthIncrease = 1;
+                CollectableProperties collectableProps = other.GetComponent<CollectableProperties>();
+                
+                if (collectableProps != null && collectableProps.isRare)
+                {
+                    healthIncrease = 5;
+                    healthText.text = (int.Parse(healthText.text) + healthIncrease).ToString();
+                }
+
                 ScoreText.text = (int.Parse(ScoreText.text) + 1).ToString();
                 collectableAllyList.Remove(other.gameObject);
                 Destroy(other.gameObject);
@@ -159,9 +226,43 @@ public class EnemySpawnerScript : MonoBehaviour
         }
     }
 
+    void SpawnCollectables(List<GameObject> collectables)
+    {
+        for (int i = 0; i < collectableCount; i++)
+        {
+            int allyRandom1 = Random.Range(-4, 4);
+            int allyRandom2 = Random.Range(-4, 4);
+            Vector3 instantiatePosition = new Vector3(transform.position.x + allyRandom1, transform.position.y, transform.position.z + allyRandom2);
+
+            GameObject collectable;
+
+            // 10% chance to spawn the heart object
+            if (Random.value < 0.1f)
+            {
+                collectable = Instantiate(heartObject, instantiatePosition, Quaternion.identity);
+            }
+            else
+            {
+                GameObject collectablePrefab = collectables[Random.Range(0, collectables.Count)];
+                collectable = Instantiate(collectablePrefab, instantiatePosition, Quaternion.identity);
+            }
+
+            collectableAllyList.Add(collectable);
+        }
+    }
+
     private IEnumerator ChangeSceneAfterDelay(float afterSeconds)
     {
         yield return new WaitForSeconds(afterSeconds); 
         SceneManager.LoadScene("MainScene");
+    }
+
+    bool IsCloseToLocation(float currentLatitude, float currentLongitude, float targetLatitude, float targetLongitude)
+    {
+        float distance = Mathf.Sqrt(
+            Mathf.Pow(currentLatitude - targetLatitude, 2) +
+            Mathf.Pow(currentLongitude - targetLongitude, 2));
+
+        return distance < locationThreshold;
     }
 }
