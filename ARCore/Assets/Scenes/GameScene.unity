@@ -580,24 +580,31 @@ MonoBehaviour:
   locationThreshold: 0.0001
   heartObject: {fileID: 7926536206873256812, guid: abb9cb9d2da4d4f0883ead4f0a6de091,
     type: 3}
-  cafeteriaLatitude: 40.890976
-  cafeteriaLongitude: 29.380026
+  cafeteriaLatitude: 40.891354
+  cafeteriaLongitude: 29.379942
   cafeteriaCollectables:
   - {fileID: 8876463639790220501, guid: d68beee1d38369145b56a07431d02732, type: 3}
   - {fileID: 9145542959179828537, guid: 220011220e7337f43a374a35428a8867, type: 3}
   - {fileID: 4398236367112636731, guid: f71e70b1c3c203a41a57f19857e4ccf7, type: 3}
   ICLatitude: 40.890213
   ICLongitude: 29.377438
-  ICCollectables: []
+  ICCollectables:
+  - {fileID: 7904713484118923825, guid: bc872a222baa3e541acaf7d390c1e9aa, type: 3}
+  - {fileID: 1793499937985081026, guid: 149b70b364be9b64d9e331169f8b5c28, type: 3}
+  - {fileID: 3862829661469340043, guid: 013fa0d55df1c3841b8c569db9dd1ba6, type: 3}
   grassLatitude: 40.890213
   grassLongitude: 29.377438
-  grassCollectables: []
+  grassCollectables:
+  - {fileID: 1793499937985081026, guid: 149b70b364be9b64d9e331169f8b5c28, type: 3}
   FENSLatitude: 40.890213
   FENSLongitude: 29.377438
-  FENSCollectables: []
+  FENSCollectables:
+  - {fileID: 7647134206250791342, guid: cc91c8ba8b9a34f4d99e70d721f60b64, type: 3}
+  - {fileID: 8189980434977739222, guid: 2dfbb63c9cdf7504faf4ff26b0581598, type: 3}
   FMANLatitude: 40.892136
   FMANLongitude: 29.37922
-  FMANCollectables: []
+  FMANCollectables:
+  - {fileID: 8364023290967103941, guid: 22fabe0714817f24892f6dae3225211a, type: 3}
 --- !u!4 &491027299
 Transform:
   m_ObjectHideFlags: 0

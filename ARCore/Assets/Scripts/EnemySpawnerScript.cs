@@ -39,8 +39,8 @@ public class EnemySpawnerScript : MonoBehaviour
     [SerializeField] List<GameObject> cafeteriaCollectables;
 
     // location based --> IC
-    [SerializeField] float ICLatitude = 40.8902126f;
-    [SerializeField] float ICLongitude = 29.3774370f;
+    [SerializeField] float ICLatitude = 40.9276085f; 
+    [SerializeField] float ICLongitude = 29.3205172f;
     [SerializeField] List<GameObject> ICCollectables;
 
     // location based --> grass
@@ -109,7 +109,7 @@ public class EnemySpawnerScript : MonoBehaviour
                     SpawnCollectables(ICCollectables);
                 }
                 // grass
-                else if (IsCloseToLocation(currentLocation.latitude, currentLocation.longitude, grassLatitude, grassLongitude))
+                /*else if (IsCloseToLocation(currentLocation.latitude, currentLocation.longitude, grassLatitude, grassLongitude))
                 {
                     SpawnCollectables(grassCollectables);
                 }
@@ -122,7 +122,7 @@ public class EnemySpawnerScript : MonoBehaviour
                 else if (IsCloseToLocation(currentLocation.latitude, currentLocation.longitude, FMANLatitude, FMANLongitude))
                 {
                     SpawnCollectables(FMANCollectables);
-                }
+                }*/
                 else
                 {
                     SpawnCollectables(collectableAllies);
@@ -196,20 +196,21 @@ public class EnemySpawnerScript : MonoBehaviour
                 }
             }
         }
-        else if (other.CompareTag("CollectableAlly"))
+        else if (other.CompareTag("CollectableAlly") || other.CompareTag("Heart"))
         {
             if (!isGameFinished) { 
                 Debug.Log("Player collected collectable");
-                int healthIncrease = 1;
-                CollectableProperties collectableProps = other.GetComponent<CollectableProperties>();
+                //CollectableProperties collectableProps = other.GetComponent<CollectableProperties>();
                 
-                if (collectableProps != null && collectableProps.isRare)
+                if (other.CompareTag("Heart")) 
                 {
-                    healthIncrease = 5;
-                    healthText.text = (int.Parse(healthText.text) + healthIncrease).ToString();
+                    healthText.text = (int.Parse(healthText.text) + 5).ToString();
                 }
-
-                ScoreText.text = (int.Parse(ScoreText.text) + 1).ToString();
+                else
+                {
+                    ScoreText.text = (int.Parse(ScoreText.text) + 1).ToString();
+                }
+                
                 collectableAllyList.Remove(other.gameObject);
                 Destroy(other.gameObject);
 
@@ -234,20 +235,19 @@ public class EnemySpawnerScript : MonoBehaviour
             int allyRandom2 = Random.Range(-4, 4);
             Vector3 instantiatePosition = new Vector3(transform.position.x + allyRandom1, transform.position.y, transform.position.z + allyRandom2);
 
-            GameObject collectable;
+            GameObject aliveCollectable;
 
             // 10% chance to spawn the heart object
             if (Random.value < 0.1f)
             {
-                collectable = Instantiate(heartObject, instantiatePosition, Quaternion.identity);
+                aliveCollectable = Instantiate(heartObject, instantiatePosition, Quaternion.identity);
+                collectableAllyList.Add(aliveCollectable);
             }
             else
             {
-                GameObject collectablePrefab = collectables[Random.Range(0, collectables.Count)];
-                collectable = Instantiate(collectablePrefab, instantiatePosition, Quaternion.identity);
+                aliveCollectable = Instantiate(collectables[Random.Range(0, collectables.Count)], instantiatePosition, Quaternion.identity);
+                collectableAllyList.Add(aliveCollectable);
             }
-
-            collectableAllyList.Add(collectable);
         }
     }
 
