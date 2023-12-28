@@ -5,6 +5,10 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+#if UNITY_ANDROID
+using UnityEngine.Android;
+#endif
+
 public class EnemySpawnerScript : MonoBehaviour
 {
     [SerializeField] GameObject enemy;
@@ -58,14 +62,21 @@ public class EnemySpawnerScript : MonoBehaviour
     [SerializeField] float FMANLongitude = 29.3792200f;
     [SerializeField] List<GameObject> FMANCollectables;
 
+    [SerializeField] Text LocationText;
+
+
     private bool isGameFinished = false;
+
 
     void Start()
     {
-        /*if (!Permission.HasUserAuthorizedPermission(Permission.FineLocation))
+        #if UNITY_ANDROID
+        if (!Permission.HasUserAuthorizedPermission(Permission.FineLocation))
         {
             Permission.RequestUserPermission(Permission.FineLocation);
-        }*/
+        }
+        #endif
+
 
         if (!Input.location.isEnabledByUser) return;
 
@@ -102,31 +113,47 @@ public class EnemySpawnerScript : MonoBehaviour
                 if (IsCloseToLocation(currentLocation.latitude, currentLocation.longitude, cafeteriaLatitude, cafeteriaLongitude))
                 {
                     SpawnCollectables(cafeteriaCollectables);
+                    LocationText.text = "Cafeteria";
+                   
                 }
                 // IC
                 else if (IsCloseToLocation(currentLocation.latitude, currentLocation.longitude, ICLatitude, ICLongitude))
                 {
                     SpawnCollectables(ICCollectables);
+                    LocationText.text = "Library";
+
                 }
                 // grass
-                /*else if (IsCloseToLocation(currentLocation.latitude, currentLocation.longitude, grassLatitude, grassLongitude))
+                else if (IsCloseToLocation(currentLocation.latitude, currentLocation.longitude, grassLatitude, grassLongitude))
                 {
                     SpawnCollectables(grassCollectables);
+                    LocationText.text = "Grass";
+
                 }
                 // FENS
                 else if (IsCloseToLocation(currentLocation.latitude, currentLocation.longitude, FENSLatitude, FENSLongitude))
                 {
                     SpawnCollectables(FENSCollectables);
+                    LocationText.text = "FENS";
+
                 }
                 // UC
                 else if (IsCloseToLocation(currentLocation.latitude, currentLocation.longitude, FMANLatitude, FMANLongitude))
                 {
                     SpawnCollectables(FMANCollectables);
-                }*/
+                    LocationText.text = "UC";
+
+                }
                 else
                 {
                     SpawnCollectables(collectableAllies);
+                    LocationText.text = "Unknown location";
                 }
+            }
+            else
+            {
+                SpawnCollectables(collectableAllies);
+                LocationText.text = "Location could not be verified";
             }
 
 
