@@ -47,7 +47,7 @@
 
 				// uv1 is the remap of left and right screen to a full screen
 				uv1 = i.uv - 0.5;
-				uv1.x = uv1.x * 2 - 0.5 + step(i.uv.x, 0.5);
+				uv1.x = uv1.x * 2.4 - 0.5 + step(i.uv.x, 0.5);
 
 				t1 = sqrt(1.0 - uv1.x * uv1.x - uv1.y * uv1.y);
 				t2 = 1.0 / (t1 * tan(_FOV * 0.5));
