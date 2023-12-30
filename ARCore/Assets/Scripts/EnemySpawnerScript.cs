@@ -4,6 +4,9 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+#if UNITY_ANDROID
+using UnityEngine.Android;
+#endif
 
 public class EnemySpawnerScript : MonoBehaviour
 {
@@ -30,12 +33,12 @@ public class EnemySpawnerScript : MonoBehaviour
     [SerializeField] Text HighscoreText;
     [SerializeField] Text ScoreText;
 
-    [SerializeField] float locationThreshold = 0.0001f;
+    [SerializeField] float locationThreshold = 0.0005f;
     [SerializeField] GameObject heartObject;
 
     // location based --> cafeteria
-    [SerializeField] float cafeteriaLatitude = 40.8913544f;
-    [SerializeField] float cafeteriaLongitude = 29.3799419f;
+    [SerializeField] float cafeteriaLatitude = 40.8913894f;
+    [SerializeField] float cafeteriaLongitude = 29.3798876f;
     [SerializeField] List<GameObject> cafeteriaCollectables;
 
     // location based --> IC
@@ -44,28 +47,36 @@ public class EnemySpawnerScript : MonoBehaviour
     [SerializeField] List<GameObject> ICCollectables;
 
     // location based --> grass
-    [SerializeField] float grassLatitude = 40.8915148f;
-    [SerializeField] float grassLongitude = 29.3792097f;
+    [SerializeField] float grassLatitude = 40.8913442f;
+    [SerializeField] float grassLongitude = 29.3791577f;
     [SerializeField] List<GameObject> grassCollectables;
 
     // location based --> FENS
-    [SerializeField] float FENSLatitude = 40.8906865f;
-    [SerializeField] float FENSLongitude = 29.3795895f;
+    [SerializeField] float FENSLatitude = 40.8906637f;
+    [SerializeField] float FENSLongitude = 29.3797448f;
     [SerializeField] List<GameObject> FENSCollectables;
 
     // location based --> FMAN
-    [SerializeField] float FMANLatitude = 40.8921368f;
-    [SerializeField] float FMANLongitude = 29.3792200f;
+    [SerializeField] float FMANLatitude = 40.8920220f;
+    [SerializeField] float FMANLongitude = 29.3790876f;
     [SerializeField] List<GameObject> FMANCollectables;
+
+    [SerializeField] Text LocationText;
+
+    private float Distance;
+    
 
     private bool isGameFinished = false;
 
     void Start()
     {
-        /*if (!Permission.HasUserAuthorizedPermission(Permission.FineLocation))
+        #if UNITY_ANDROID
+        if (!Permission.HasUserAuthorizedPermission(Permission.FineLocation))
         {
             Permission.RequestUserPermission(Permission.FineLocation);
-        }*/
+        }
+        #endif
+        
 
         if (!Input.location.isEnabledByUser) return;
 
@@ -101,32 +112,44 @@ public class EnemySpawnerScript : MonoBehaviour
                 // cafeteria
                 if (IsCloseToLocation(currentLocation.latitude, currentLocation.longitude, cafeteriaLatitude, cafeteriaLongitude))
                 {
+                    LocationText.text = "Cafeteria: " + Distance.ToString();
                     SpawnCollectables(cafeteriaCollectables);
-                }
-                // IC
-                else if (IsCloseToLocation(currentLocation.latitude, currentLocation.longitude, ICLatitude, ICLongitude))
-                {
-                    SpawnCollectables(ICCollectables);
-                }
-                // grass
-                /*else if (IsCloseToLocation(currentLocation.latitude, currentLocation.longitude, grassLatitude, grassLongitude))
-                {
-                    SpawnCollectables(grassCollectables);
                 }
                 // FENS
                 else if (IsCloseToLocation(currentLocation.latitude, currentLocation.longitude, FENSLatitude, FENSLongitude))
                 {
+                    LocationText.text = "FENS: " + Distance.ToString();
                     SpawnCollectables(FENSCollectables);
                 }
-                // UC
+                
+                //grass
+                else if (IsCloseToLocation(currentLocation.latitude, currentLocation.longitude, grassLatitude, grassLongitude))
+                {
+                    LocationText.text = "Grass: " + Distance.ToString();
+                    SpawnCollectables(grassCollectables);
+                }
+                // FMAN
                 else if (IsCloseToLocation(currentLocation.latitude, currentLocation.longitude, FMANLatitude, FMANLongitude))
                 {
+                    LocationText.text = "FMAN: " + Distance.ToString();
                     SpawnCollectables(FMANCollectables);
-                }*/
+                }
+                // IC
+                else if (IsCloseToLocation(currentLocation.latitude, currentLocation.longitude, ICLatitude, ICLongitude))
+                {
+                    LocationText.text = "Library: " + Distance.ToString();
+                    SpawnCollectables(ICCollectables);
+                }
                 else
                 {
+                    LocationText.text = "Unknown Location";
                     SpawnCollectables(collectableAllies);
+                    //healthText.text = "90";
                 }
+            }
+            else{
+                LocationText.text = "Location not verified";
+                SpawnCollectables(collectableAllies);
             }
 
 
@@ -262,6 +285,8 @@ public class EnemySpawnerScript : MonoBehaviour
         float distance = Mathf.Sqrt(
             Mathf.Pow(currentLatitude - targetLatitude, 2) +
             Mathf.Pow(currentLongitude - targetLongitude, 2));
+
+        Distance = distance;
 
         return distance < locationThreshold;
     }
