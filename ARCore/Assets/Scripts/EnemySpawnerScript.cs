@@ -26,6 +26,7 @@ public class EnemySpawnerScript : MonoBehaviour
     private List<GameObject> enemyList = new List<GameObject>();
 
     private List<GameObject> collectableAllyList = new List<GameObject>();
+    [SerializeField] float objectLifetime;
 
     // logics for UI
     [SerializeField] GameObject gameOverPanel;
@@ -89,6 +90,7 @@ public class EnemySpawnerScript : MonoBehaviour
             int allyRandom2 = Random.Range(-4, 4);
             Vector3 instantiatePositionCollectable = new Vector3(transform.position.x + allyRandom1, transform.position.y, transform.position.z + allyRandom2);
             GameObject aliveCollectable = Instantiate(collectableAllies[Random.Range(0, collectableAllies.Count)], instantiatePositionCollectable, Quaternion.identity);
+            aliveCollectable.AddComponent<SpawnTimestamp>();
             collectableAllyList.Add(aliveCollectable);
         }
     }
@@ -173,8 +175,13 @@ public class EnemySpawnerScript : MonoBehaviour
                 Vector3 instantiatePosition = new Vector3(transform.position.x + specifiedRandomNumber, transform.position.y + Random.Range(-1, 5), transform.position.z + specifiedRandomNumber);
 
                 GameObject aliveEnemy = Instantiate(enemy, instantiatePosition, Quaternion.identity);
+                aliveEnemy.AddComponent<SpawnTimestamp>();
                 enemyList.Add(aliveEnemy);
             }
+
+            // check if lifetime of objects finished
+            CheckAndDestroyObjects(enemyList);
+            CheckAndDestroyObjects(collectableAllyList);
         }
 
         foreach (GameObject enemyGameObject in enemyList)
@@ -264,11 +271,14 @@ public class EnemySpawnerScript : MonoBehaviour
             if (Random.value < 0.1f)
             {
                 aliveCollectable = Instantiate(heartObject, instantiatePosition, Quaternion.identity);
+                aliveCollectable.AddComponent<SpawnTimestamp>();
                 collectableAllyList.Add(aliveCollectable);
+
             }
             else
             {
                 aliveCollectable = Instantiate(collectables[Random.Range(0, collectables.Count)], instantiatePosition, Quaternion.identity);
+                aliveCollectable.AddComponent<SpawnTimestamp>();
                 collectableAllyList.Add(aliveCollectable);
             }
         }
@@ -289,5 +299,27 @@ public class EnemySpawnerScript : MonoBehaviour
         Distance = distance;
 
         return distance < locationThreshold;
+    }
+
+
+    void CheckAndDestroyObjects(List<GameObject> objectList)
+    {
+        List<GameObject> objectsToRemove = new List<GameObject>();
+
+        foreach (GameObject obj in objectList)
+        {
+            // Check if the object's lifetime has exceeded
+            if (obj.GetComponent<SpawnTimestamp>().lifeTime >= objectLifetime)
+            {
+                objectsToRemove.Add(obj);
+            }
+        }
+
+        // Remove and destroy objects
+        foreach (GameObject objToRemove in objectsToRemove)
+        {
+            objectList.Remove(objToRemove);
+            Destroy(objToRemove);
+        }
     }
 }
